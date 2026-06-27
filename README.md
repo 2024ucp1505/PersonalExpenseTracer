@@ -1,27 +1,63 @@
-# FinTrack — Personal Finance Tracker
+# 📊 FinTrack — Personal Finance Tracker with AI Insights
 
-A full-stack personal finance management app built with **React**, **Node.js**, **Express**, and **MySQL**.
+![Status](https://img.shields.io/badge/Status-Development-orange)
+![Database](https://img.shields.io/badge/Database-MySQL-blue)
+![AI-Agent](https://img.shields.io/badge/AI-Text%20to%20SQL-purple)
+![Tailwind](https://img.shields.io/badge/CSS-Tailwind%20v4-blueviolet)
 
-> Built to demonstrate relational database concepts: foreign keys, JOINs, aggregations, transactions, and normalization.
-
----
-
-## 🖥️ Tech Stack
-
-| Layer      | Technology                 |
-|------------|---------------------------|
-| Frontend   | React 19 + Vite            |
-| Backend    | Node.js + Express          |
-| Database   | MySQL (relational)         |
-| Auth       | JWT + bcrypt               |
-| Charts     | Recharts                   |
-| HTTP       | Axios                      |
+A full-stack, mobile-responsive personal finance manager. By combining a 3NF normalized relational database structure, safe atomic transactions, and a multi-stage **Text-to-SQL AI Assistant** powered by Google Gemini, the application allows users to manage their funds while querying their data in natural language.
 
 ---
 
-## 📊 Database Schema (5 normalized tables)
+## 🌐 Live Deployment
 
-### Entity-Relationship Diagram
+| Component | Status | URL |
+|-----------|--------|-----|
+| **Frontend (App)** | ⏱️ Pending | **[Launch Application (Link Placeholder)]()** |
+| **Backend (API)** | ⏱️ Pending | [Check Health Status (Link Placeholder)]() |
+
+---
+
+## 🛡️ Text-to-SQL AI Assistant Pipeline
+
+FinTrack features a custom natural language querying interface. Rather than relying on static dashboard queries, students and interviewers can query financial histories using standard conversation.
+
+### The 3-Step LLM Pipeline
+
+```mermaid
+graph TD
+    A[User Natural Language Query] --> B[Step A: Prompt Construction with DB Schema]
+    B --> C[Gemini 2.5 Flash generates SELECT Query]
+    C --> D{5-Layer Security Check}
+    D -->|Fail| E[❌ HTTP 400 Bad Request]
+    D -->|Pass| F[Step B: Execute SQL against Pool]
+    F --> G[Step C: Ingest results & formulate insight]
+    G --> H[🤖 UI Bubble Displays Response]
+```
+
+### 🔒 5-Layer Security Enforcement
+
+To prevent SQL Injection, data exfiltration, or table drop attacks, the server executes five sequential validation steps on the generated query string prior to execution:
+
+1. **Verify `SELECT` Only**: Ensures the query starts with a strict `SELECT` keyword.
+2. **DML/DDL Blocklist**: Uses regex to block standard writing, updating, or destructive keywords:
+   ```regex
+   /\b(INSERT|UPDATE|DELETE|DROP|TRUNCATE|ALTER|CREATE|REPLACE|GRANT|REVOKE|EXEC|EXECUTE|CALL)\b/i
+   ```
+3. **No Direct User Table Access**: Blocks `FROM users` references to prevent exposed bcrypt password hashes or email lists from escaping.
+4. **No UNION Exfiltration**: Blocks `UNION` statements, `INTO OUTFILE`, and `LOAD_FILE` to prevent cross-table data dump attacks.
+5. **Strict Scope Validation**: Validates the presence of `user_id` filters to prevent query leakage across different users:
+   ```regex
+   /user_id\s*=\s*\d+/i
+   ```
+
+---
+
+## 📊 Relational Database Design & Normalization
+
+The core database architecture is built on a **3rd Normal Form (3NF)** relational layout. This guarantees data integrity, eliminates redundancy, and scales predictably.
+
+### Database Entity-Relationship Diagram
 
 ```mermaid
 erDiagram
@@ -73,135 +109,132 @@ erDiagram
         TIMESTAMP created_at
     }
 
-    USERS ||--o{ ACCOUNTS : "has many"
-    USERS ||--o{ CATEGORIES : "has many"
-    USERS ||--o{ TRANSACTIONS : "has many"
-    USERS ||--o{ BUDGETS : "has many"
-    ACCOUNTS ||--o{ TRANSACTIONS : "linked to"
+    USERS ||--o{ ACCOUNTS : "has"
+    USERS ||--o{ CATEGORIES : "has"
+    USERS ||--o{ TRANSACTIONS : "records"
+    USERS ||--o{ BUDGETS : "sets"
+    ACCOUNTS ||--o{ TRANSACTIONS : "debits/credits"
     CATEGORIES ||--o{ TRANSACTIONS : "categorizes"
-    CATEGORIES ||--o{ BUDGETS : "budget for"
+    CATEGORIES ||--o{ BUDGETS : "allocates"
 ```
 
-### Relationships Overview
+### Normalization Breakdown
 
-```mermaid
-graph TD
-    U[USERS] -->|1:N| A[ACCOUNTS]
-    U -->|1:N| C[CATEGORIES]
-    U -->|1:N| T[TRANSACTIONS]
-    U -->|1:N| B[BUDGETS]
-    A -->|1:N| T
-    C -->|1:N| T
-    C -->|1:N| B
-
-    style U fill:#6366f1,stroke:#4f46e5,color:#fff
-    style A fill:#3b82f6,stroke:#2563eb,color:#fff
-    style C fill:#8b5cf6,stroke:#7c3aed,color:#fff
-    style T fill:#ef4444,stroke:#dc2626,color:#fff
-    style B fill:#f59e0b,stroke:#d97706,color:#fff
-```
-
-### Key SQL Concepts Used
-- **Foreign Keys** with `ON DELETE CASCADE`
-- **JOINs** (INNER + LEFT) across 3 tables
-- **GROUP BY** + **SUM** aggregations
-- **MySQL Transactions** (`BEGIN` / `COMMIT` / `ROLLBACK`)
-- **Sub-queries** (budget vs actual spending)
-- **Indexes** for query optimization
-- **ENUM** types, **UNIQUE** constraints
-- **DATE functions** (`MONTH()`, `YEAR()`, `DATE_SUB()`)
+- **First Normal Form (1NF)**: All columns contain atomic values. Repeated values, such as tracking multiple transactions in a single array cell, are avoided by separating them into single row entities.
+- **Second Normal Form (2NF)**: All tables have a designated Primary Key. Non-key columns depend entirely on the primary key (e.g. `balance` belongs strictly to `accounts.id` and not the user overall).
+- **Third Normal Form (3NF)**: Eliminates transitive dependencies. For example, the `transactions` table contains only foreign keys pointing to `accounts` and `categories`. It does not store category icons or names directly. This prevents update anomalies where changing a category name would require rewriting every past transaction.
 
 ---
 
-## 📁 Project Structure
+## 🖥️ Tech Stack
+
+- **Frontend**: React 19, Vite 7, Tailwind CSS v4, Recharts, Axios
+- **Backend**: Node.js, Express, `@google/generative-ai`
+- **Database**: MySQL, `mysql2/promise` connection pooling
+- **Authentication**: Stateless JSON Web Tokens (JWT), bcrypt password hashing
+
+---
+
+## 📝 Key DBMS Learning Concepts Demonstrated
+
+1. **ACID Transactions**: Storing transactions executes atomic operations in `server/routes/transactions.js`. Balance increments and transaction records either succeed together or roll back entirely:
+   ```sql
+   START TRANSACTION;
+   INSERT INTO transactions ...;
+   UPDATE accounts SET balance = balance - amount WHERE id = ...;
+   COMMIT;
+   ```
+2. **Aggregations & Complex JOINs**: Dashboard routes perform multi-table left joins and aggregations to sum monthly logs, group spending by categories, and fetch 6-month trends.
+3. **Database Performance Indexing**: High-traffic lookups index on common search parameters (e.g. compound index on `(user_id, date)` and `(user_id, category_id)`).
+
+---
+
+## 📁 Repository Structure
 
 ```
-projectforjpmc/
-├── server/                 # Backend API
-│   ├── server.js           # Express entry point
-│   ├── config/db.js        # MySQL connection pool
-│   ├── middleware/auth.js   # JWT auth middleware
+expense_tracer/
+├── server/                         # Express REST API
+│   ├── server.js                   # Application Boot
+│   ├── config/db.js                # connection pool configuration
+│   ├── middleware/auth.js          # JWT Route Protection
 │   ├── routes/
-│   │   ├── auth.js          # Register, Login, /me
-│   │   ├── accounts.js      # CRUD
-│   │   ├── categories.js    # CRUD
-│   │   ├── transactions.js  # CRUD + MySQL transactions
-│   │   ├── budgets.js       # Budget vs spending (JOINs)
-│   │   └── dashboard.js     # Analytics (6 aggregate queries)
+│   │   ├── auth.js                 # Registration / Authentication
+│   │   ├── accounts.js             # Account CRUD
+│   │   ├── categories.js           # Category Settings
+│   │   ├── transactions.js         # Transaction Entries
+│   │   ├── budgets.js              # Limits & Threshold Checks
+│   │   ├── dashboard.js            # Analytical Visual Queries
+│   │   └── insights.js             # Text-to-SQL Gemini Endpoint
 │   └── db/
-│       ├── init.sql         # Schema definition
-│       ├── runInit.js       # Run schema
-│       └── seed.js          # Demo data
+│       ├── init.sql                # Table definitions & DDL scripts
+│       ├── runInit.js              # Database initialization script
+│       └── seed.js                 # Sample database records
 │
-├── client/                 # Frontend
-│   └── src/
-│       ├── App.jsx          # Routing
-│       ├── index.css        # Full design system
-│       ├── context/AuthContext.jsx
-│       ├── services/api.js  # Axios + interceptors
-│       ├── components/      # Navbar, StatCard, ProtectedRoute
-│       └── pages/           # Dashboard, Transactions, Accounts, Budgets, Categories
-│
-└── README.md
+└── client/                         # React SPA (Vite)
+    ├── src/
+    │   ├── components/
+    │   │   ├── Navbar.jsx          # Mobile Hamburger / Sidebar
+    │   │   └── AIChat.jsx          # Sliding Chat Window & Suggestion Tags
+    │   ├── context/
+    │   │   └── AuthContext.jsx     # User Context Provider
+    │   ├── pages/
+    │   │   ├── Dashboard.jsx       # Analytics & Visual charts
+    │   │   ├── Transactions.jsx    # Ledger overview
+    │   │   ├── Accounts.jsx        # Managed checking/savings wallets
+    │   │   └── Budgets.jsx         # Category progress limits
+    │   └── services/
+    │       └── api.js              # Axios instance configuration
+```
+
+---
+
+## ⚙️ Environment Configuration
+
+### Backend Setup (`server/.env`)
+```env
+PORT=5000
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_mysql_password
+DB_NAME=finance_tracker
+JWT_SECRET=your_cryptographically_secure_jwt_secret
+GEMINI_API_KEY=your_gemini_api_key_from_google_ai_studio
+```
+
+### Frontend Setup (`client/.env.local`)
+```env
+VITE_API_URL=http://localhost:5000/api
 ```
 
 ---
 
 ## 🚀 Setup Instructions
 
-### Prerequisites
-- **Node.js** (v18+)
-- **MySQL** (v8+) running locally
-
-### 1. Database Setup
+### 1. Database Initialization
+Ensure your local MySQL service is running, then execute:
 ```bash
-# Update server/.env with your MySQL password
 cd server
 npm install
-npm run db:init     # Creates database + tables
-node db/seed.js     # Inserts demo data
+npm run db:init     # Provisions tables and relations
+node db/seed.js     # Seeds initial demo data
 ```
 
-### 2. Start Backend
+### 2. Start Servers
+Run the backend API:
 ```bash
 cd server
-npm run dev         # Runs on http://localhost:5000
+npm run dev
 ```
 
-### 3. Start Frontend
+In a new terminal window, start the frontend server:
 ```bash
 cd client
-npm install         # Already done if you followed setup
-npm run dev         # Runs on http://localhost:5173
+npm install
+npm run dev
 ```
-
-### 4. Login
-- **Email:** `demo@example.com`
-- **Password:** `password123`
+Open **http://localhost:5173** to view the application.
 
 ---
 
-## ✨ Features
-
-- **Dashboard** — Total balance, income/expense charts, spending breakdown pie chart
-- **Transactions** — Add, filter (by type/account/category), delete with auto balance update
-- **Accounts** — Manage bank accounts, wallets, credit cards with net worth
-- **Budgets** — Set monthly budgets per category with progress bars
-- **Categories** — Custom income/expense categories with emoji icons
-- **Auth** — JWT-based registration and login
-
----
-
-## 📝 Key Learning Points for DBMS
-
-1. **`server/db/init.sql`** — Study the schema: 5 tables, foreign keys, indexes, constraints
-2. **`server/routes/transactions.js`** — MySQL transactions with `BEGIN`/`COMMIT`/`ROLLBACK`
-3. **`server/routes/dashboard.js`** — Complex aggregation queries with JOINs and GROUP BY
-4. **`server/routes/budgets.js`** — LEFT JOIN with sub-query to compare budget vs actual spending
-5. **`server/config/db.js`** — Connection pooling pattern
-
----
-
-## License
-
-MIT
+## 📜 License
+MIT License.
