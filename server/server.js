@@ -29,6 +29,10 @@ app.use('/api/dashboard',    require('./routes/dashboard'));
 app.use('/api/insights',     require('./routes/insights'));
 
 // ── Health check ────────────────────────────────────────
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', message: 'FinTrack API is running' });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
