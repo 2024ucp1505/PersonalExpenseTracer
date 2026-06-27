@@ -5,11 +5,16 @@ require('dotenv').config();
 const app = express();
 
 // ── Middleware ───────────────────────────────────────────
+const allowedOrigins = [
+  'http://localhost:5173',
+];
+if (process.env.CLIENT_URL) {
+  // Support both single strings and potential arrays
+  allowedOrigins.push(process.env.CLIENT_URL);
+}
+
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://fintrack-ruddy-psi.vercel.app',  // replace with your actual Vercel URL
-  ],
+  origin: allowedOrigins,
   credentials: true,
 }));
 app.use(express.json());
