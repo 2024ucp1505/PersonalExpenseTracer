@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
+import AIChat from './components/AIChat';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -17,7 +18,8 @@ function AppRoutes() {
   return (
     <>
       <Navbar />
-      <main className="main-content">
+      {/* Offset content for desktop sidebar (w-60) and mobile top bar (h-14) */}
+      <main className={`${user ? 'md:ml-60 pt-14 md:pt-0' : ''} min-h-screen`}>
         <Routes>
           <Route path="/login"    element={user ? <Navigate to="/" /> : <Login />} />
           <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
@@ -29,6 +31,8 @@ function AppRoutes() {
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
+      {/* AI Chat bubble — only shown when logged in */}
+      {user && <AIChat />}
     </>
   );
 }

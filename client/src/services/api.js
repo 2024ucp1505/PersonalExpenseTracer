@@ -72,4 +72,9 @@ export const dashboardAPI = {
   get: (params) => api.get('/dashboard', { params }),
 };
 
+// ── AI Insights ─────────────────────────────────────────
+export const insightsAPI = {
+  query: (question) => api.post('/insights', { query: question }),
+};
+
 export default api;
