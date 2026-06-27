@@ -1,6 +1,6 @@
 # 📊 FinTrack — Personal Finance Tracker with AI Insights
 
-![Status](https://img.shields.io/badge/Status-Development-orange)
+![Status](https://img.shields.io/badge/Status-Production%20Ready-success)
 ![Database](https://img.shields.io/badge/Database-MySQL-blue)
 ![AI-Agent](https://img.shields.io/badge/AI-Text%20to%20SQL-purple)
 ![Tailwind](https://img.shields.io/badge/CSS-Tailwind%20v4-blueviolet)
@@ -13,8 +13,8 @@ A full-stack, mobile-responsive personal finance manager. By combining a 3NF nor
 
 | Component | Status | URL |
 |-----------|--------|-----|
-| **Frontend (App)** | ⏱️ Pending | **[Launch Application (Link Placeholder)]()** |
-| **Backend (API)** | ⏱️ Pending | [Check Health Status (Link Placeholder)]() |
+| **Frontend (App)** | 🟢 Online | **[Launch Application](https://fintrack-ruddy-psi.vercel.app)** |
+| **Backend (API)** | 🟢 Online | [Check Health Status](https://personalexpensetracer-production.up.railway.app/api/health) |
 
 ---
 
