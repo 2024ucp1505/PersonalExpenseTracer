@@ -4,6 +4,7 @@
 ![Database](https://img.shields.io/badge/Database-MySQL-blue)
 ![AI-Agent](https://img.shields.io/badge/AI-Text%20to%20SQL-purple)
 ![Tailwind](https://img.shields.io/badge/CSS-Tailwind%20v4-blueviolet)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/2024ucp1505/PersonalExpenseTracer)
 
 A full-stack, mobile-responsive personal finance manager. By combining a 3NF normalized relational database structure, safe atomic transactions, and a multi-stage **Text-to-SQL AI Assistant** powered by Google Gemini, the application allows users to manage their funds while querying their data in natural language.
 
